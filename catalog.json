@@ -1,0 +1,30 @@
+{
+  "catalogVersion": 1,
+  "updatedAt": "2026-11-11",
+  "apps": [
+    {
+      "id": "com.techgenius.tvoslauncher",
+      "name": "tvOS Launcher",
+      "category": "Araçlar",
+      "shortDescription": "Android TV için ana ekran başlatıcısı",
+      "description": "Android TV'de ana ekran (launcher) olarak çalışan bir uygulamadır. Yalnızca TV içindir: bu mağazadan ADB ile TV'ye gönderilip kurulur. Kurulumdan sonra TV'de ana ekran uygulaması olarak seçilebilir.",
+      "iconUrl": "https://raw.githubusercontent.com/SamulVanunu/apk-magaza-katalog/main/icons/tvos-launcher.png",
+      "screenshots": [],
+      "tvSupported": true,
+      "addedAt": "2026-11-11",
+      "minSdk": 24,
+      "abis": [],
+      "versions": [
+        {
+          "versionName": "2.1.0",
+          "versionCode": 10,
+          "apkUrl": "https://raw.githubusercontent.com/SamulVanunu/apk-magaza-katalog/main/apk/tvos-launcher-2.1.0.apk",
+          "sizeBytes": 6684571,
+          "sha256": "194858a351139c5312e0fd819ebe6892f06085840fa05b2f4a0c53dcd688cacd",
+          "releasedAt": "2026-11-11",
+          "notes": "Mağazaya ilk eklenen sürüm."
+        }
+      ]
+    }
+  ]
+}
