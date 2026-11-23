@@ -179,7 +179,7 @@
 
   function msg(el,text,kind){el.innerHTML="";if(!text)return;const d=document.createElement("div");d.className="msg "+(kind||"");d.textContent=text;el.appendChild(d);}
   function authHeaders(json){const h={Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"};if(token)h.Authorization="Bearer "+token;if(json)h["Content-Type"]="application/json";return h;}
-  async function api(path,opt){const r=await fetch(API+path,{...opt,body:opt&&opt.json!==undefined?JSON.stringify(opt.json):undefined,headers:{...authHeaders(opt&&opt.json),...(opt&&opt.headers||{})}});let body=null;try{body=await r.json();}catch(e){}if(!r.ok){if(r.status===403&&opt&&opt.method&&opt.method!=="GET")throw new Error("Bu jetonun Contents: Read and write izni yok");const e=new Error((body&&body.message)||("HTTP "+r.status));e.status=r.status;throw e;}return body;}
+  async function api(path,opt){const r=await fetch(API+path,{...opt,body:opt&&opt.json!==undefined?JSON.stringify(opt.json):undefined,headers:{...authHeaders(opt&&opt.json),...(opt&&opt.headers||{})}});let body=null;try{body=await r.json();}catch(e){}if(!r.ok){if(r.status===403&&opt&&opt.method&&opt.method!=="GET")throw new Error("Bu jetonun Contents: Read and write izni yok");const det=(body&&Array.isArray(body.errors)&&body.errors.length)?(" ["+body.errors.map(x=>(x.field||x.resource||"?")+":"+(x.code||"?")).join(", ")+"]"):"";const e=new Error("HTTP "+r.status+" "+path+" — "+((body&&body.message)||"hata")+det);e.status=r.status;throw e;}return body;}
 
   function showApp(){
     $("app").classList.remove("hidden");
