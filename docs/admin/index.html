@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://raw.githubusercontent.com; connect-src https://api.github.com https://raw.githubusercontent.com; font-src 'self' data:; form-action 'none'; base-uri 'none'; frame-ancestors 'none'">
+<title>APK Mağaza — Yönetici Paneli</title>
+<style>
+  :root{
+    --bg:#111418; --card:#191d23; --card2:#1f242b; --fg:#e8ecf2; --muted:#98a2b3;
+    --border:#2a313a; --lime:#C6F06B; --lime-dark:#a9d44f; --ink:#111418;
+    --err:#ff7b72; --ok:#7ee787; --warn:#f2cc60; --r:14px;
+  }
+  html[data-theme="light"]{
+    --bg:#f4f6f3; --card:#ffffff; --card2:#f0f3ec; --fg:#1b1f24; --muted:#5a636e;
+    --border:#d8ded4; --lime:#7fae20; --lime-dark:#6d971a; --ink:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-text-size-adjust:100%}
+  a{color:var(--lime)}
+  button,.btn{min-height:48px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--fg);padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+  .primary{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+  .primary:hover{background:var(--lime-dark)}
+  .danger{background:transparent;color:var(--err);border-color:var(--err)}
+  .muted{color:var(--muted)}
+  .small{font-size:13px}
+  .wrap{max-width:1240px;margin:0 auto;padding:16px}
+  header{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  header h1{font-size:20px;margin:0;flex:1 1 240px}
+  .badge{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--muted)}
+  .badge.tv{border-color:var(--lime);color:var(--lime)}
+  .badge.err{border-color:var(--err);color:var(--err)}
+  .badge.ok{border-color:var(--ok);color:var(--ok)}
+  .grid{display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:860px){.grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:start}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px}
+  .card h2{font-size:16px;margin:0 0 12px}
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+  input,select,textarea{width:100%;min-height:48px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--fg);padding:10px 12px;font:inherit}
+  textarea{min-height:88px;resize:vertical}
+  input[type=checkbox]{width:24px;min-height:24px;accent-color:var(--lime)}
+  .check{display:flex;align-items:center;gap:10px;min-height:48px}
+  .check label{margin:0;color:var(--fg)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .row>*{flex:1 1 180px}
+  .row>.fix{flex:0 0 auto}
+  .stack{display:grid;gap:8px}
+  .app-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;gap:12px;align-items:center;cursor:pointer;min-height:72px}
+  .app-card:hover{border-color:var(--lime)}
+  .app-card img{width:52px;height:52px;border-radius:12px;object-fit:cover;background:var(--bg);flex:0 0 auto}
+  .app-meta{min-width:0;flex:1}
+  .app-meta b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .app-meta span{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+  .msg{border-radius:12px;padding:10px 12px;margin:10px 0;border:1px solid var(--border);background:var(--card2)}
+  .msg.err{border-color:var(--err);color:var(--err)}
+  .msg.ok{border-color:var(--ok);color:var(--ok)}
+  .msg.info{border-color:var(--info,var(--lime));color:var(--lime)}
+  .hidden{display:none!important}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--muted)}
+  .dot.ok{background:var(--ok)} .dot.err{background:var(--err)} .dot.run{background:var(--warn)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--muted);font-weight:600}
+  .kv{display:grid;grid-template-columns:minmax(110px,40%) 1fr;gap:4px 10px;font-size:13px}
+  .kv dt{color:var(--muted)} .kv dd{margin:0;overflow-wrap:anywhere}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;overflow-wrap:anywhere}
+  .footer{margin:24px 0;color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>APK Mağaza — Yönetici</h1>
+    <span class="badge" id="authBadge">Giriş yok</span>
+    <button id="themeBtn" class="fix" aria-label="Temayı değiştir">☾ Tema</button>
+  </header>
+
+  <div id="loginCard" class="card">
+    <h2>Giriş</h2>
+    <p class="muted small">Fine-grained PAT: yalnızca bu depo, <b>Contents: read &amp; write</b>. Jeton yalnızca bu tarayıcıda tutulur, depoya yazılmaz.</p>
+    <label for="token">Kişisel erişim jetonu</label>
+    <input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
+    <div class="row" style="margin-top:12px">
+      <button id="loginBtn" class="primary">Giriş</button>
+      <button id="logoutBtn" class="hidden">Çıkış</button>
+    </div>
+    <div id="loginMsg"></div>
+  </div>
+
+  <div id="app" class="grid hidden">
+    <section>
+      <div class="card">
+        <h2>Katalog</h2>
+        <div class="row">
+          <button id="refreshBtn" class="primary">Kataloğu yenile</button>
+          <span class="badge" id="catalogInfo">—</span>
+        </div>
+        <div id="catalogMsg"></div>
+        <div id="appList" class="stack" style="margin-top:12px"></div>
+      </div>
+
+      <div class="card" id="detailCard">
+        <h2>Detay</h2>
+        <div id="detail"><p class="muted">Bir uygulama kartına dokun.</p></div>
+      </div>
+
+      <div class="card">
+        <h2>Doğrulama ve sağlık kontrolü</h2>
+        <div class="row">
+          <button id="validateBtn">Şema kontrolü</button>
+          <button id="healthBtn">Sağlık kontrolü</button>
+        </div>
+        <div id="validateMsg"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="card">
+        <h2>APK yükle</h2>
+        <label for="apkFile">APK dosyası</label>
+        <input id="apkFile" type="file" accept=".apk,application/vnd.android.package-archive">
+        <label for="metaName">Ad</label><input id="metaName" placeholder="Uygulama adı">
+        <label for="metaCategory">Kategori</label><input id="metaCategory" placeholder="Diğer">
+        <label for="metaShort">Kısa açıklama</label><input id="metaShort">
+        <label for="metaDesc">Açıklama</label><textarea id="metaDesc"></textarea>
+        <label for="metaNotes">Sürüm notu</label><input id="metaNotes">
+        <label for="metaScreens">Ekran görüntüleri (ham URL, virgülle)</label><input id="metaScreens">
+        <div class="check"><input id="metaTv" type="checkbox"><label for="metaTv">TV destekli</label></div>
+        <div class="check"><input id="metaTvOnly" type="checkbox"><label for="metaTvOnly">Yalnızca TV</label></div>
+        <label for="metaIcon">İkon (PNG, isteğe bağlı)</label><input id="metaIcon" type="file" accept="image/png">
+        <div class="row" style="margin-top:12px"><button id="uploadBtn" class="primary">Yükle ve işlet</button></div>
+        <div id="uploadMsg"></div>
+        <div id="runStatus" class="msg hidden"></div>
+      </div>
+
+      <div class="card" id="editCard">
+        <h2>Uygulamayı düzenle</h2>
+        <p class="muted small" id="editHint">Önce soldan bir uygulama seç.</p>
+        <div id="editFields" class="hidden">
+          <label for="edName">Ad</label><input id="edName">
+          <label for="edCategory">Kategori</label><input id="edCategory">
+          <label for="edShort">Kısa açıklama</label><input id="edShort">
+          <label for="edDesc">Açıklama</label><textarea id="edDesc"></textarea>
+          <label for="edScreens">Ekran görüntüleri (virgülle)</label><input id="edScreens">
+          <label for="edPop">Popülerlik</label><input id="edPop" type="number">
+          <div class="check"><input id="edTv" type="checkbox"><label for="edTv">tvSupported</label></div>
+          <div class="check"><input id="edTvOnly" type="checkbox"><label for="edTvOnly">tvOnly</label></div>
+          <label for="edNotes">En yeni sürüm notu</label><textarea id="edNotes"></textarea>
+          <div class="row" style="margin-top:12px">
+            <button id="saveEditBtn" class="primary">Kaydet</button>
+            <button id="removeVersionBtn" class="danger">Sürümü kaldır</button>
+            <button id="removeAppBtn" class="danger">Uygulamayı kaldır</button>
+          </div>
+        </div>
+        <div id="editMsg"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer">Yalnızca <code>api.github.com</code> ve <code>raw.githubusercontent.com</code> kullanılır. Harici betik/CDN yok.</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const OWNER="SamulVanunu", REPO="apk-magaza-katalog", BRANCH="main";
+  const API="https://api.github.com", RAW="https://raw.githubusercontent.com/"+OWNER+"/"+REPO+"/main/";
+  const TOKEN_KEY="apk-magaza-pat";
+  const $=(id)=>document.getElementById(id);
+  let token=localStorage.getItem(TOKEN_KEY)||"";
+  let catalog=null, baseSha=null, selected=null, selectedVersion=null, runTimer=null;
+
+  function setTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem("apk-theme",t);$("themeBtn").textContent=t==="light"?"☀ Açık":"☾ Koyu";}
+  setTheme(localStorage.getItem("apk-theme")||"dark");
+  $("themeBtn").onclick=()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
+
+  function msg(el,text,kind){el.innerHTML="";if(!text)return;const d=document.createElement("div");d.className="msg "+(kind||"");d.textContent=text;el.appendChild(d);}
+  function authHeaders(json){const h={Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"};if(token)h.Authorization="Bearer "+token;if(json)h["Content-Type"]="application/json";return h;}
+  async function api(path,opt){const r=await fetch(API+path,{...opt,headers:{...authHeaders(opt&&opt.json),...(opt&&opt.headers||{})}});let body=null;try{body=await r.json();}catch(e){}if(!r.ok){const e=new Error((body&&body.message)||("HTTP "+r.status));e.status=r.status;throw e;}return body;}
+
+  function showApp(){
+    $("app").classList.remove("hidden");
+    $("loginCard").classList.add("hidden");
+    $("authBadge").textContent="Giriş yapıldı";
+    $("authBadge").className="badge ok";
+    $("logoutBtn").classList.remove("hidden");
+    $("loginBtn").classList.add("hidden");
+  }
+  function showLogin(){
+    $("app").classList.add("hidden");
+    $("loginCard").classList.remove("hidden");
+    $("authBadge").textContent="Giriş yok";
+    $("authBadge").className="badge";
+    $("logoutBtn").classList.add("hidden");
+    $("loginBtn").classList.remove("hidden");
+  }
+
+  $("loginBtn").onclick=async()=>{
+    const t=$("token").value.trim();msg($("loginMsg"),"");
+    if(!t){msg($("loginMsg"),"Jeton girin.","err");return;}
+    try{
+      const r=await fetch(API+"/repos/"+OWNER+"/"+REPO,{headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+t}});
+      const b=await r.json();
+      if(!r.ok)throw new Error(b.message||"Doğrulama başarısız");
+      const perms=(b.permissions||{});
+      if(!(perms.contents==="write"||perms.contents==="admin"))throw new Error("Bu jetonun Contents izni 'write' değil ("+(perms.contents||"yok")+"). Fine-grained PAT'te Contents: read & write verin.");
+      token=t;localStorage.setItem(TOKEN_KEY,t);$("token").value="";
+      showApp();msg($("loginMsg"),"Giriş başarılı.","ok");await loadCatalog();
+    }catch(e){msg($("loginMsg"),"Giriş hatası: "+e.message,"err");}
+  };
+  $("logoutBtn").onclick=()=>{token="";localStorage.removeItem(TOKEN_KEY);$("token").value="";catalog=null;selected=null;showLogin();msg($("loginMsg"),"Jeton tarayıcıdan silindi.","ok");};
+
+  async function loadCatalog(){
+    msg($("catalogMsg"),"Katalog yükleniyor…","info");
+    try{
+      const r=await fetch(RAW+"catalog.json?t="+Date.now(),{cache:"no-store"});
+      if(!r.ok)throw new Error("catalog.json HTTP "+r.status);
+      catalog=await r.json();
+      const ref=await api("/repos/"+OWNER+"/"+REPO+"/git/ref/heads/"+BRANCH);
+      baseSha=ref.object.sha;
+      const apps=catalog.apps||[];
+      $("catalogInfo").textContent=apps.length+" uygulama · "+(catalog.updatedAt||"—");
+      renderList(apps);msg($("catalogMsg"),"");
+    }catch(e){msg($("catalogMsg"),"Yükleme hatası: "+e.message,"err");}
+  }
+  $("refreshBtn").onclick=loadCatalog;
+
+  function renderList(apps){
+    const box=$("appList");box.innerHTML="";
+    if(!apps.length){box.innerHTML='<p class="muted">Katalog boş. İlk APK’yı yükleyin.</p>';return;}
+    apps.forEach((a,idx)=>{
+      const ver=(a.versions||[])[0]||{};
+      const card=document.createElement("div");card.className="app-card";card.tabIndex=0;card.setAttribute("role","button");
+      const img=document.createElement("img");img.src=a.iconUrl||"";img.alt="";
+      img.onerror=()=>{img.style.visibility="hidden";};
+      const meta=document.createElement("div");meta.className="app-meta";
+      const b=document.createElement("b");b.textContent=a.name||a.id;
+      const s=document.createElement("span");s.textContent=(a.id||"")+" · "+(ver.versionName||"—");
+      meta.append(b,s);
+      const badges=document.createElement("div");
+      if(a.tvSupported){const t=document.createElement("span");t.className="badge tv";t.textContent=a.tvOnly?"TV only":"TV";badges.appendChild(t);}
+      card.append(img,meta,badges);
+      const pick=()=>selectApp(idx);
+      card.onclick=pick;card.onkeydown=(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick();}};
+      box.appendChild(card);
+    });
+  }
+
+  function selectApp(idx){
+    selected=idx;selectedVersion=0;const a=catalog.apps[idx];
+    const d=$("detail");d.innerHTML="";
+    const dl=document.createElement("dl");dl.className="kv";
+    [["Ad",a.name],["Paket",a.id],["Kategori",a.category],["Kısa açıklama",a.shortDescription],["Açıklama",a.description],["TV",a.tvOnly?"Yalnızca TV":(a.tvSupported?"Destekli":"Hayır")],["MinSdk",a.minSdk],["Eklendi",a.addedAt],["Popülerlik",a.popularity??"—"]].forEach(([k,v])=>{
+      const dt=document.createElement("dt");dt.textContent=k;const dd=document.createElement("dd");dd.textContent=v==null||v===""?"—":v;dl.append(dt,dd);
+    });
+    d.appendChild(dl);
+    const h=document.createElement("h3");h.textContent="Sürüm geçmişi";h.className="small";d.appendChild(h);
+    const table=document.createElement("table");
+    table.innerHTML="<thead><tr><th>Sürüm</th><th>Code</th><th>Tarih</th><th>Not</th></tr></thead>";
+    const tb=document.createElement("tbody");
+    (a.versions||[]).forEach((v,i)=>{
+      const tr=document.createElement("tr");
+      [v.versionName,v.versionCode,v.releasedAt,v.notes].forEach(x=>{const td=document.createElement("td");td.textContent=x??"—";tr.appendChild(td);});
+      tr.tabIndex=0;tr.style.cursor="pointer";tr.onclick=()=>{selectedVersion=i;fillEdit();};
+      tb.appendChild(tr);
+    });
+    table.appendChild(tb);d.appendChild(table);
+    fillEdit();
+  }
+
+  function fillEdit(){
+    const box=$("editFields");
+    if(selected==null){box.classList.add("hidden");$("editHint").classList.remove("hidden");return;}
+    box.classList.remove("hidden");$("editHint").classList.add("hidden");
+    const a=catalog.apps[selected],v=(a.versions||[])[selectedVersion||0]||{};
+    $("edName").value=a.name||"";$("edCategory").value=a.category||"";
+    $("edShort").value=a.shortDescription||"";$("edDesc").value=a.description||"";
+    $("edScreens").value=(a.screenshots||[]).join(", ");$("edPop").value=a.popularity??"";
+    $("edTv").checked=!!a.tvSupported;$("edTvOnly").checked=!!a.tvOnly;
+    $("edNotes").value=v.notes||"";
+  }
+
+  function splitList(s){return s.split(",").map(x=>x.trim()).filter(Boolean);}
+  async function commitFiles(files,message){
+    const tree=[];
+    for(const f of files){
+      if(f.delete){tree.push({path:f.path,mode:"100644",type:"blob",sha:null});continue;}
+      const content=f.base64||btoa(unescape(encodeURIComponent(f.text||"")));
+      const blob=await api("/repos/"+OWNER+"/"+REPO+"/git/blobs",{method:"POST",json:{content:content,encoding:"base64"}});
+      tree.push({path:f.path,mode:"100644",type:"blob",sha:blob.sha});
+    }
+    const t=await api("/repos/"+OWNER+"/"+REPO+"/git/trees",{method:"POST",json:{base_tree:baseSha,tree:tree}});
+    const c=await api("/repos/"+OWNER+"/"+REPO+"/git/commits",{method:"POST",json:{message:message,tree:t.sha,parents:[baseSha]}});
+    await api("/repos/"+OWNER+"/"+REPO+"/git/refs/heads/"+BRANCH,{method:"PATCH",json:{sha:c.sha,force:false}});
+    baseSha=c.sha;return c;
+  }
+
+  function fileToBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=()=>rej(r.error);r.readAsDataURL(file);});}
+
+  $("uploadBtn").onclick=async()=>{
+    const box=$("uploadMsg");msg(box,"");
+    const apk=$("apkFile").files[0];
+    if(!apk){msg(box,"APK dosyası seçin.","err");return;}
+    const base=$("metaName").value.trim()||apk.name.replace(/\.apk$/i,"").replace(/[^A-Za-z0-9._-]/g,"_");
+    const path="inbox/"+base+".apk";
+    const meta={name:$("metaName").value.trim(),category:$("metaCategory").value.trim(),shortDescription:$("metaShort").value.trim(),description:$("metaDesc").value.trim(),notes:$("metaNotes").value.trim(),screenshots:splitList($("metaScreens").value),tvSupported:$("metaTv").checked,tvOnly:$("metaTvOnly").checked};
+    const files=[];
+    try{
+      $("uploadBtn").disabled=true;
+      msg(box,"APK okunuyor…","info");
+      files.push({path:path,base64:await fileToBase64(apk)});
+      files.push({path:"inbox/"+base+".json",text:JSON.stringify(meta,null,2)});
+      const icon=$("metaIcon").files[0];
+      if(icon)files.push({path:"icons/"+base+".png",base64:await fileToBase64(icon)});
+      msg(box,"GitHub’a yazılıyor…","info");
+      await commitFiles(files,"inbox: "+base+" yükle");
+      msg(box,"Yüklendi. Workflow bekleniyor…","ok");
+      watchRun();
+    }catch(e){msg(box,"Yükleme hatası: "+e.message,"err");$("uploadBtn").disabled=false;}
+  };
+
+  function watchRun(){
+    const el=$("runStatus");el.classList.remove("hidden");
+    el.innerHTML='<span class="dot run"></span> Workflow durumu sorgulanıyor…';
+    let tries=0;
+    if(runTimer)clearInterval(runTimer);
+    runTimer=setInterval(async()=>{
+      try{
+        const d=await api("/repos/"+OWNER+"/"+REPO+"/actions/runs?event=push&per_page=5");
+        const run=(d.workflow_runs||[]).find(r=>r.head_branch===BRANCH);
+        if(!run){if(++tries>40)finish("Workflow bulunamadı.",true);return;}
+        const status=run.status,conclusion=run.conclusion;
+        const label=status==="queued"?"Kuyrukta":status==="in_progress"?"Çalışıyor":conclusion==="success"?"Başarılı":conclusion==="failure"?"Başarısız":(conclusion||status||"—");
+        const cls=conclusion==="success"?"ok":(conclusion==="failure"?"err":"run");
+        let extra="";
+        if(conclusion==="failure"){
+          try{const jobs=await api("/repos/"+OWNER+"/"+REPO+"/actions/runs/"+run.id+"/jobs");
+            const bad=(jobs.jobs||[]).flatMap(j=>(j.steps||[])).filter(s=>s.conclusion==="failure").map(s=>s.name);
+            if(bad.length)extra=" — başarısız adım: "+bad.join(", ");
+          }catch(e){}
+        }
+        el.innerHTML='<span class="dot '+cls+'"></span> '+label+extra+' · <a href="'+run.html_url+'" target="_blank" rel="noopener">run #'+run.run_number+'</a>';
+        if(conclusion==="success"){finish(" workflow başarılı, katalog yenileniyor.","ok");clearInterval(runTimer);await loadCatalog();}
+        else if(conclusion==="failure"){finish(" workflow başarısız.","err");clearInterval(runTimer);}
+        else if(++tries>120){finish(" Zaman aşımı.","err");clearInterval(runTimer);}
+      }catch(e){el.textContent="Durum sorgulama hatası: "+e.message;}
+    },3000);
+    function finish(t,kind){
+      if(kind==="ok")msg($("uploadMsg"),t,"ok");
+      else if(kind==="err")msg($("uploadMsg"),t,"err");
+      else el.innerHTML='<span class="dot err"></span> '+t;
+    }
+  }
+
+  $("saveEditBtn").onclick=async()=>{
+    if(selected==null){msg($("editMsg"),"Uygulama seçin.","err");return;}
+    try{
+      const a=catalog.apps[selected];
+      a.name=$("edName").value.trim();a.category=$("edCategory").value.trim();
+      a.shortDescription=$("edShort").value.trim();a.description=$("edDesc").value.trim();
+      a.screenshots=splitList($("edScreens").value);
+      a.popularity=$("edPop").value===""?undefined:Number($("edPop").value);
+      a.tvSupported=$("edTv").checked;a.tvOnly=$("edTvOnly").checked;
+      const v=a.versions[selectedVersion||0];if(v)v.notes=$("edNotes").value.trim();
+      catalog.updatedAt=new Date().toISOString().slice(0,10);
+      await commitFiles([{path:"catalog.json",text:JSON.stringify(catalog,null,2)+"\n"}],"katalog: "+a.name+" düzenle");
+      msg($("editMsg"),"Kaydedildi.","ok");await loadCatalog();
+    }catch(e){msg($("editMsg"),"Kaydetme hatası: "+e.message+(e.status===409?" (SHA çakışması — lütfen yenileyip tekrar deneyin)":""),"err");}
+  };
+
+  function confirmRemove(text){return window.confirm(text);}
+
+  $("removeVersionBtn").onclick=async()=>{
+    if(selected==null)return;
+    const a=catalog.apps[selected],v=a.versions[selectedVersion||0];
+    if(!v)return;
+    if(!confirmRemove("Sürüm "+v.versionName+" katalogdan kaldırılsın mı?"))return;
+    let apkOk=true;
+    const apkName=v.apkUrl.split("/").pop();
+    if(confirmRemove("APK dosyası ("+apkName+") da silinsin mi? 'İptal' yalnızca katalog kaydını kaldırır."))apkOk=true;
+    try{
+      const files=[{path:"catalog.json",text:JSON.stringify(catalog,null,2)+"\n"}];
+      if(apkOk)files.push({path:"apk/"+apkName,delete:true});
+      await commitFiles(files,"katalog: "+a.name+" "+v.versionName+" kaldır");
+      msg($("editMsg"),"Sürüm kaldırıldı.","ok");await loadCatalog();
+    }catch(e){msg($("editMsg"),"Silme hatası: "+e.message,"err");}
+  };
+
+  $("removeAppBtn").onclick=async()=>{
+    if(selected==null)return;
+    const a=catalog.apps[selected];
+    if(!confirmRemove("Uygulama "+a.name+" tüm sürümleriyle kaldırılsın mı?"))return;
+    const files=[{path:"catalog.json",text:JSON.stringify(catalog,null,2)+"\n"}];
+    if(confirmRemove("APK dosyaları da silinsin mi?")){
+      (a.versions||[]).forEach(v=>files.push({path:"apk/"+v.apkUrl.split("/").pop(),delete:true}));
+    }
+    try{await commitFiles(files,"katalog: "+a.name+" uygulaması kaldır");msg($("editMsg"),"Uygulama kaldırıldı.","ok");selected=null;await loadCatalog();}
+    catch(e){msg($("editMsg"),"Silme hatası: "+e.message,"err");}
+  };
+
+  $("validateBtn").onclick=async()=>{
+    const box=$("validateMsg");msg(box,"");
+    if(!catalog){msg(box,"Önce katalog yükleyin.","err");return;}
+    const issues=[];
+    const req=["catalogVersion","updatedAt","apps"];
+    req.forEach(k=>{if(!(k in catalog))issues.push("catalog."+k+" eksik");});
+    const hex=/^[0-9a-f]{64}$/;
+    (catalog.apps||[]).forEach(a=>{
+      ["id","name","category","shortDescription","description","iconUrl","screenshots","tvSupported","tvOnly","addedAt","minSdk","abis","versions"].forEach(k=>{if(!(k in a))issues.push(a.id+": "+k+" eksik");});
+      const vs=a.versions||[];
+      vs.forEach(v=>{
+        ["versionName","versionCode","apkUrl","sizeBytes","sha256","signerSha256","releasedAt","notes"].forEach(k=>{if(!(k in v))issues.push(a.id+"/"+v.versionName+": "+k+" eksik");});
+        if(!hex.test(v.sha256||""))issues.push(a.id+"/"+v.versionName+": sha256 biçimi");
+        if(!hex.test(v.signerSha256||""))issues.push(a.id+"/"+v.versionName+": signerSha256 biçimi");
+        if(!(v.apkUrl||"").startsWith(RAW))issues.push(a.id+"/"+v.versionName+": apkUrl kökü");
+      });
+      for(let i=0;i<vs.length-1;i++)if(vs[i].versionCode<=vs[i+1].versionCode)issues.push(a.id+": sürüm sırası bozuk");
+    });
+    msg(box,issues.length?("Şema sorunları:\n"+issues.join("\n")):"Şema kontrolü geçti ("+(catalog.apps||[]).length+" uygulama).",issues.length?"err":"ok");
+  };
+
+  $("healthBtn").onclick=async()=>{
+    const box=$("validateMsg");msg(box,"Sağlık kontrolü çalışıyor…","info");
+    if(!catalog){msg(box,"Önce katalog yükleyin.","err");return;}
+    const lines=[],problems=[];
+    for(const a of catalog.apps||[]){
+      for(const v of a.versions||[]){
+        try{
+          const r=await fetch(v.apkUrl+"?t="+Date.now(),{cache:"no-store"});
+          if(!r.ok){problems.push(v.apkUrl+" HTTP "+r.status);continue;}
+          const buf=await r.arrayBuffer();
+          const hash=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",buf))).map(b=>b.toString(16).padStart(2,"0")).join("");
+          const ok=hash===v.sha256;
+          lines.push((ok?"✓ ":"✗ ")+v.apkUrl.split("/").pop()+" ("+buf.byteLength+" B)");
+          if(!ok)problems.push(v.apkUrl+" hash uyuşmuyor");
+        }catch(e){problems.push(v.apkUrl+" — "+e.message);}
+      }
+    }
+    msg(box,(problems.length?"Sorunlar:\n"+problems.join("\n")+"\n\n":"")+lines.join("\n")||"Kontrol edilecek sürüm yok.",problems.length?"err":"ok");
+  };
+
+  if(token){showApp();loadCatalog();}else{showLogin();}
+})();
+</script>
+</body>
+</html>
