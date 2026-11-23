@@ -49,13 +49,41 @@ def sha256_file(path: Path) -> str:
 
 
 def signer_sha256(apk: APK) -> str:
-    """APK imza sertifikasinin (DER) SHA-256'si, 64 kucuk harf hex."""
-    signature = apk.get_signature()
-    if isinstance(signature, str):
-        signature = signature.encode()
-    if not signature:
-        return ""
-    return hashlib.sha256(signature).hexdigest().lower()
+    """Sertifika DER baytlarinin SHA-256'sini (64 kucuk harf hex) dondurur.
+
+    get_signature() v1 imza blogunun ham verisini dondurdugu icin kullanilmaz.
+    Sertifika DER'i sirasiyla v3, v2, v1'den alinir. Birden fazla imzaci
+    sertifikasi varsa hata verilir.
+    """
+    last_error: Optional[Exception] = None
+    for method_name in (
+        "get_certificates_der_v3",
+        "get_certificates_der_v2",
+        "get_certificates_der_v1",
+    ):
+        method = getattr(apk, method_name, None)
+        if method is None:
+            continue
+        try:
+            certs = method()
+        except Exception as exc:
+            last_error = exc
+            continue
+        if not certs:
+            continue
+        if len(certs) > 1:
+            raise ValueError(
+                f"{method_name}: birden fazla imzaci sertifikasi ({len(certs)}); tek imzaci bekleniyor"
+            )
+        cert = certs[0]
+        if isinstance(cert, str):
+            cert = cert.encode()
+        if not cert:
+            continue
+        return hashlib.sha256(cert).hexdigest().lower()
+    if last_error is not None:
+        raise ValueError(f"Sertifika DER alinamadi: {last_error}")
+    return ""
 
 
 def tv_flags(apk: APK) -> Tuple[bool, bool]:

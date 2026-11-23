@@ -22,7 +22,7 @@
           "apkUrl": "https://raw.githubusercontent.com/SamulVanunu/apk-magaza-katalog/main/apk/tvos-launcher-2.1.0.apk",
           "sizeBytes": 6684571,
           "sha256": "194858a351139c5312e0fd819ebe6892f06085840fa05b2f4a0c53dcd688cacd",
-          "signerSha256": "d1384ca4c6bdc3a3a3568f47d1b048df1e1f3c02bbd25a33668570a9bb5db7ef",
+          "signerSha256": "34353c4376b1f0c0576d22335169d92082d170061a13e9bc8637c5ac8140a59f",
           "releasedAt": "2026-11-11",
           "notes": "Mağazaya ilk eklenen sürüm."
         }
