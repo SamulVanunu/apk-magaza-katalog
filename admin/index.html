@@ -205,6 +205,9 @@
       const r=await fetch(API+"/repos/"+OWNER+"/"+REPO+"/contents/catalog.json",{headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+t}});
       if(r.status===401||r.status===403)throw new Error("Jeton geçersiz veya bu depoya erişimi yok");
       if(!r.ok){let b={};try{b=await r.json();}catch(e){}throw new Error(b.message||"Doğrulama başarısız");}
+      const who=await fetch(API+"/user",{headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+t}});
+      if(who.status===401||who.status===403)throw new Error("Jeton geçersiz veya tarayıcı gönderemiyor — gizli sekmede yeniden deneyin");
+      if(!who.ok)throw new Error("Jeton doğrulanamadı (HTTP "+who.status+")");
       token=t;localStorage.setItem(TOKEN_KEY,t);$("token").value="";
       showApp();msg($("loginMsg"),"Giriş başarılı.","ok");await loadCatalog();
     }catch(e){msg($("loginMsg"),"Giriş hatası: "+e.message,"err");}
