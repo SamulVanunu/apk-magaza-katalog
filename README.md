@@ -66,14 +66,6 @@ APK'yı `inbox/` içine koyup `main` dalına push edin. İsteğe bağlı yan dos
 
 > Depo herkese açıktır. Keystore, `google-services.json`, API anahtarı, parola veya classic PAT **asla** eklemeyin.
 
-## GitHub Pages
-
-**Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` / klasör: `/docs` → Save.**
-
-Yayın adresi: **https://samulvanunu.github.io/apk-magaza-katalog/admin/**
-
-> GitHub Pages REST API yalnızca `/` ve `/docs` klasörlerini docroot olarak kabul ediyor; `/admin` doğrudan seçilemiyor. Bu nedenle panel `admin/index.html` (kaynak) ve `docs/admin/index.html` (yayınlanan kopya) olarak tutulur; `/docs` docroot sayesinde istenen `/admin/` adresi elde edilir. Pages ayarı API üzerinden yapılmış ve `source: {branch: main, path: /docs}` olarak doğrulanmıştır.
-
 ## Panel özellikleri
 
 - Giriş/Çıkış (jeton doğrulaması ve `Contents: write` kontrolü)
