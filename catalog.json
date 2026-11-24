@@ -1,6 +1,6 @@
 {
   "catalogVersion": 1,
-  "updatedAt": "2026-11-11",
+  "updatedAt": "2026-11-24",
   "apps": [
     {
       "id": "com.techgenius.tvoslauncher",
@@ -25,6 +25,32 @@
           "signerSha256": "34353c4376b1f0c0576d22335169d92082d170061a13e9bc8637c5ac8140a59f",
           "releasedAt": "2026-11-11",
           "notes": "Mağazaya ilk eklenen sürüm."
+        }
+      ]
+    },
+    {
+      "id": "com.samuelvideo.app",
+      "name": "ANDREI",
+      "category": "Video",
+      "shortDescription": "Desteklenen bağlantılardan video veya ses indir.",
+      "description": "Bağlantıyı yapıştırıp içeriği inceleyin; video veya ses olarak kaydedin. Tamamlanan dosyalar Arşiv bölümünde görünür.",
+      "iconUrl": "https://raw.githubusercontent.com/SamulVanunu/apk-magaza-katalog/main/icons/app.png",
+      "screenshots": [],
+      "tvSupported": false,
+      "tvOnly": false,
+      "addedAt": "2026-11-24",
+      "minSdk": 24,
+      "abis": [],
+      "versions": [
+        {
+          "versionName": "1.4.4",
+          "versionCode": 15,
+          "apkUrl": "https://raw.githubusercontent.com/SamulVanunu/apk-magaza-katalog/main/apk/app-1.4.4.apk",
+          "sizeBytes": 102473706,
+          "sha256": "748423167e816bfdb545947b90a0c3f5e7486fd4d829eff97dfee79a8f79c25b",
+          "signerSha256": "6bc1db876f7c8272e3d927296d077b35f5de5de401bd345ea4b6bbe913fe03f5",
+          "releasedAt": "2026-11-24",
+          "notes": "Web aktarımı, video incelemesi ve web'den başlatılan indirmeler için"
         }
       ]
     }
