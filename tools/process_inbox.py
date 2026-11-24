@@ -378,6 +378,8 @@ class Processor:
             if proc.returncode != 0:
                 raise RuntimeError(f"{' '.join(args[:2])} basarisiz: {proc.stderr.strip()}")
 
+        run(["git", "config", "user.name", "github-actions[bot]"])
+        run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"])
         run(["git", "add", "-A"])
         run(["git", "commit", "-m", message])
         if token:
