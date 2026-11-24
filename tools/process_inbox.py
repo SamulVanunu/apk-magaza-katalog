@@ -227,7 +227,12 @@ class Processor:
 
             # git mv ile tasima (dosya inbox'tan kaldirilir).
             APK_DIR.mkdir(parents=True, exist_ok=True)
-            subprocess.run(["git", "mv", str(apk_path), str(target_path)], check=True)
+            #Izlenmeyen dosyalar (Release asset'i) git mv ile tasinamaz; duzenli move kullan.
+            moved = subprocess.run(
+                ["git", "mv", str(apk_path), str(target_path)], capture_output=True, text=True
+            )
+            if moved.returncode != 0:
+                shutil.move(str(apk_path), str(target_path))
             self.moved.append((apk_path, target_path))
             if apk_path.exists():
                 apk_path.unlink()
@@ -283,7 +288,10 @@ class Processor:
 
     def extract_icon(self, apk: APK, output: Path) -> None:
         try:
-            icon = apk.get_icon()
+            method = getattr(apk, "get_icon", None) or getattr(apk, "get_app_icon", None)
+            if method is None:
+                return
+            icon = method()
             if not icon:
                 return
             if isinstance(icon, (bytes, bytearray)):

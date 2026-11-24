@@ -34,14 +34,19 @@ jobs:
         run: python -m pip install --upgrade pip && pip install pyaxmlparser cryptography
 
       - name: Release asset'lerini inbox'a indir
-        if: github.event_name == 'release'
+        if: github.event_name != 'push'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
           RELEASE_BODY: ${{ github.event.release.body }}
         run: |
           mkdir -p inbox
-          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir inbox --pattern '*.apk'
+          TAG="$RELEASE_TAG"
+          if [ -z "$TAG" ]; then TAG=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName); fi
+          BODY="$RELEASE_BODY"
+          if [ -z "$BODY" ]; then BODY=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq .body); fi
+          export RELEASE_BODY="$BODY"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir inbox --pattern '*.apk'
           python - <<'PY'
           import json, os
           from pathlib import Path
