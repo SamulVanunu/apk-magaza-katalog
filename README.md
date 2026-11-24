@@ -25,6 +25,20 @@ Ham dosya kökü: `https://raw.githubusercontent.com/SamulVanunu/apk-magaza-kata
 3. **Yükle ve işlet** düğmesi APK'yı `inbox/<ad>.apk`, bilgileri `inbox/<ad>.json` olarak yazar ve workflow'u izler.
 4. İşlem başarılıysa katalog otomatik yenilenir. Aynı sürüm (eşit/küçük `versionCode`) yüklenirse workflow kırmızı biter ve gerekçe iş özetinde görünür.
 
+### Büyük APK'lar (GitHub Release)
+
+Panelin Git Data API yolu yaklaşık **100 MB** üzerindeki dosyalarda GitHub tarafından reddedilir (137 MB'lık istek gövdesi `401 Bad credentials` döner). Bu durumda Release kullanın:
+
+1. GitHub → **Releases → Draft a new release**. Tag oluşturun (ör. `inbox-andrei-1.4.4`), başlık verin.
+2. **Notes** alanına meta veri JSON'u koyun (boş bırakılabilir):
+   ```json
+   {"name":"ANDREI","category":"Video","shortDescription":"...","description":"...","notes":"...","screenshots":[],"tvSupported":false,"tvOnly":false}
+   ```
+3. APK dosyasını **Attach binaries** ile ekleyip **Publish release** yapın.
+4. `release: [published]` tetikleyicisi asset'i `inbox/`'a indirir, işleyici `apk/`'a taşıyıp kataloğu günceller. Katalog `apkUrl` adresi yine `raw.githubusercontent.com` olur.
+
+İşlem başarısız olursa `Actions` sekmesinden **Run workflow** (`workflow_dispatch`) ile en son Release asset'i yeniden denenebilir.
+
 ### Manuel
 
 APK'yı `inbox/` içine koyup `main` dalına push edin. İsteğe bağlı yan dosya `inbox/<ad>.json`:
