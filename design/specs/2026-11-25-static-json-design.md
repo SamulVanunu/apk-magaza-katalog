@@ -58,10 +58,9 @@ Yorumlar ve şikayetler gibi güncel olması gereken veriler **şimdilik canlı 
   "updatedAt": "2026-11-25",
   "home": {
     "headline": "Uygulamanı keşfet.",
-    "defaultSort": "popular",
-    "tabs": ["popular", "new"]
+    "defaultSort": "popular"
   },
-  "categories": ["Tümü", "Araçlar", "Video"],
+  "categories": ["Araçlar", "Video"],
   "about": {
     "title": "cep depo hakkında",
     "description": "Uygulama kataloğu, indirme ve TV yönetimi.",
@@ -70,9 +69,11 @@ Yorumlar ve şikayetler gibi güncel olması gereken veriler **şimdilik canlı 
 }
 ```
 
-Doğrulama: `siteVersion == 1`; `updatedAt` geçerli `YYYY-MM-DD`; `categories` boş olmayan, tekrarsız dizgi dizisi; `home.defaultSort` `popular` veya `new`; `tabs` bu iki değerin alt kümesi; `about.*` boş olmayan dizgiler. Her dizgi alanı için makul uzunluk sınırı (ör. 500 karakter) uygulanır.
+Doğrulama: `siteVersion == 1`; `updatedAt` geçerli `YYYY-MM-DD`; `categories` boş olmayan, tekrarsız dizgi dizisi; `home.defaultSort` `popular` veya `new`; `about.*` boş olmayan dizgiler. Her dizgi alanı için makul uzunluk sınırı (ör. 500 karakter) uygulanır.
 
-Kategori çipleri: `site.json` içindeki `categories` dizisi **temel alınır**; katalogda olup bu listede bulunmayan kategoriler listenin sonuna eklenir. Böylece yeni bir kategori, panel güncellenmeden de kaybolmaz.
+Kategori çipleri: `site.json` içindeki `categories` dizisi **temel alınır**; katalogda olup bu listede bulunmayan kategoriler listenin sonuna eklenir. Böylece yeni bir kategori, panel güncellenmeden de kaybolmaz. **"Tümü" bu listeye girmez** — mevcut kodda (`StoreScreens.kt:509`) bu, `category == null` durumunu temsil eden ayrı bir sabit çiptir (`R.string.all`). Filtre koşulu `app.category == category` olarak kalır.
+
+Sıralama: mevcut kodda iki sekme zaten vardır (`HomeSort.POPULAR`, `HomeSort.NEW`; `StoreScreens.kt:215` varsayılan `POPULAR`). `defaultSort` yalnızca açılıştaki ilk sekmeyi seçer; `tabs` alanı eklenmez (mevcut iki sekme sabit kalır). `popularity` alanı katalogda yoksa mevcut davranış korunur (`sortHomeApps` sıralamayı atlar).
 
 ### Panel tarafı
 
@@ -98,6 +99,12 @@ Kategori çipleri: `site.json` içindeki `categories` dizisi **temel alınır**;
 ### 2. faz (şimdi yapılmaz)
 
 Yorumlar ve şikayetler `CommunityViewModel` / Firebase'de kalır. Bunların okuma/yazma akışının yeniden yapılandırılması için ayrı bir tasarım dokümanı ve ayrı uygulama planı yazılacak.
+
+## Bağımsız kontrol sonrası netleşenler
+
+- **Uygulama kaynağı:** çalışma alanında repo olarak değil, `/home/samuel/İndirilenler/cep-depo-1.8.0-source.zip` (Kotlin/Compose, `com.cue.apkstore`) olarak mevcut. Uygulama tarafı değişiklikleri **2. fazda** bu kaynak kopyası üzerinde yapılır; uygulama reposu verilirse oraya aktarılır. 1. faz yalnızca panel + `site.json`.
+- **İlk yayınlanacak `site.json` değerleri:** mevcut arayüzdeki değerlerle tohumlanır (görsel davranış değişmesin): `home_headline` = "Uygulamanı keşfet.", `about_title` = "Uygulama hakkında", `about_description` = "Uygulama kataloğu, indirme ve TV yönetimi.", `versionLabel` = "Sürüm %1$s". Kategoriler katalogdaki mevcut değerlerden alınır. Örnek/illüstratif metinler yalnızca `site.sample.json` içinde kullanılır.
+- **`versionLabel` formatting kaynağı:** `BuildConfig.VERSION_NAME` (`StoreScreens.kt:400` şu an bunu kullanıyor). Katalog `updatedAt` veya `catalogVersion` kullanılmaz.
 
 ## Builder'a bırakılan kararlar
 
